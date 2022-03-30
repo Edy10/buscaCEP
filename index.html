@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <style>
+        .table {
+            width: 100%;
+            max-width: 100%;
+            margin-bottom: 16px;
+            background-color: transparent;
+            border: 1px;
+        }
+
+        .table thead tr th {
+            font-size: 17px ;
+            font-weight: bold!important;
+            align-content: center;
+        }
+        table thead tr{
+            background-color: #8080804d;
+        }
+        .table>thead>tr>th{
+            padding: 12px 8px;
+            vertical-align: middle;
+            border-color: #ddd;
+            font-weight: 300;
+        }
+        .table>tbody>tr>td{
+            padding: 12px 8px;
+            vertical-align: middle;
+            border-color: #ddd;
+            font-weight: 300;
+            font-size:14px;
+            color: #3c4858;
+        }
+    </style>
+
+    <title>Busca CEP</title>
+</head>
+<body class="p-3 my-3">
+    <div class="container">
+        <div class="card my-5">
+            <div class="card-body">
+                <div class="mb-3">
+                    <label for="cep" class="form-label">CEP</label>
+                    <input type="text" class="form-control" id="cep" placeholder="" maxlength="9">
+                </div>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <button type="button" id="busca-cep" class="btn btn-primary">Buscar</button>
+                </div>
+
+
+                <div class="row my-5">
+                    <div class="col-sm-12 tbl-cep" id="tbl-cep">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-bordered table-hover">
+                                <thead>
+                                <tr class="text-center">
+                                    <th scope="col">CEP</th>
+                                    <th scope="col">Logradouro</th>
+                                    <th scope="col">Complemento</th>
+                                    <th scope="col">Bairro</th>
+                                    <th scope="col">Cidade</th>
+                                    <th scope="col">Estado</th>
+                                </tr>
+                                </thead>
+                                <tbody id="tblDados">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-warning" role="alert" id="alert">
+                        <span id="msg"> </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', main);
+    function main(){
+        //button buscar CEP
+        const btnbusca = document.getElementById("busca-cep");
+        const tblCEP   = document.getElementById("tbl-cep");
+        const alert    = document.getElementById("alert");
+
+        alert.style.display  = "none";
+        tblCEP.style.display = "none";
+
+        btnbusca.addEventListener("click", () =>{
+            let tbl = "";
+            let cep = document.getElementById("cep").value;
+            const URL = `http://localhost/buscaCep/app/Controller/cepController.php?tipo=01&cep=${cep}`
+            fetch(`${URL}`).then((body) => body.json()).then((data) => {
+                if(data.sucesso){
+                    data.sucesso.forEach((value, key)=>{
+                        console.log(value)
+                            tbl += `<tr>`;
+                            tbl += `<td> ${value.cep} </td>`;
+                            tbl += `<td> ${value.localidade} </td>`;
+                            tbl += `<td> ${value.complemento} </td>`;
+                            tbl += `<td> ${value.bairro} </td>`;
+                            tbl += `<td> ${value.localidade} </td>`;
+                            tbl += `<td> ${value.uf} </td>`;
+                            tbl += `</tr>`;
+                    });
+                }else {
+                    tblCEP.style.display = "none";
+                    alert.style.display = "block";
+                    document.getElementById("msg").innerHTML = data.atencao;
+                }
+                if(tbl){
+                    alert.style.display = "none";
+                    document.getElementById("tblDados").innerHTML = tbl;
+                    tblCEP.style.display = "block";
+                }else {
+                    tblCEP.style.display = "none";
+                }
+            }).catch((error) => console.error('Erro:', error.message || error))
+        });
+
+
+
+        //Formata CEP
+        const inputValue = document.querySelector("#cep");
+        let zipCode = "";
+
+        inputValue.addEventListener("keyup", () => {
+            zipCode = inputValue.value;
+            if(zipCode)
+                if(zipCode.length === 8) {
+                    inputValue.value = `${zipCode.substr(0,5)}-${zipCode.substr(5,9)}`;
+                }
+        });
+    }
+</script>
+</body>
+</html>
