@@ -6,7 +6,7 @@ class Conexao {
 
     public static function getConn(){
         if(!isset(self::$instance)):
-            self::$instance = new \PDO('mysql:host=localhost;dbname=dbcep;charset=utf8', 'root', '311210');
+            self::$instance = new \PDO('mysql:host=localhost;dbname=dbcep;charset=utf8', 'root', '');
         endif;
 
         return self::$instance;
